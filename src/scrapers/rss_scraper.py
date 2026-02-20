@@ -6,9 +6,14 @@ RSS feeds are publicly accessible and don't require authentication,
 making them ideal for consistent newsletter content.
 
 Selected Sources (complementing PitchBook, not duplicating):
-1. TechCrunch AI/Startups - Breaking funding news
-2. VentureBeat AI - Industry analysis and deals
-3. The Information (free summaries) - Exclusive scoops
+1. Ars Technica - Technical AI analysis
+2. The Verge AI - Consumer tech AI coverage
+3. VentureBeat AI - Industry analysis and deals
+4. MIT Tech Review - Research-focused AI news
+5. CBInsights - AI funding research
+6. Google News - AI funding aggregator
+7. Hacker News - Tech community funding alerts
+8. SiliconANGLE - Enterprise AI and funding
 
 These sources focus on ACTUAL funding announcements that
 PitchBook tracks, providing narrative context for the numbers.
@@ -48,15 +53,18 @@ class RSSSource:
 # RSS Sources ranked by newsletter value
 # These complement PitchBook's deal data with narrative journalism
 RSS_SOURCES = [
+    # Ars Technica - Reliable tech AI analysis  
     RSSSource(
-        name="techcrunch_ai",
-        feed_url="https://techcrunch.com/category/artificial-intelligence/feed/",
+        name="arstechnica_ai",
+        feed_url="https://feeds.arstechnica.com/arstechnica/technology-lab",
         priority=1,
         enabled=True,
+        category_filter="ai|artificial intelligence|machine learning|neural|llm|chatgpt|openai|anthropic",
     ),
+    # The Verge AI - Consumer tech and AI news
     RSSSource(
-        name="techcrunch_startups",
-        feed_url="https://techcrunch.com/category/startups/feed/",
+        name="theverge_ai",
+        feed_url="https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
         priority=2,
         enabled=True,
     ),
@@ -82,20 +90,26 @@ RSS_SOURCES = [
         enabled=True,
         category_filter="ai|artificial intelligence|funding|startup|venture",
     ),
-    # Google News - AI startup funding aggregator (100+ articles)
+    # Google News - AI startup funding aggregator
     RSSSource(
         name="google_news_ai_funding",
         feed_url="https://news.google.com/rss/search?q=AI+startup+funding+round&hl=en-US&gl=US&ceid=US:en",
         priority=6,
         enabled=True,
     ),
-    # Yahoo Finance - Business/funding news
+    # Hacker News - Tech community (often catches funding news early)
     RSSSource(
-        name="yahoo_finance",
-        feed_url="https://finance.yahoo.com/rss/topstories",
+        name="hackernews_ai",
+        feed_url="https://hnrss.org/newest?q=AI+funding+OR+AI+startup+OR+raises+million",
         priority=7,
         enabled=True,
-        category_filter="ai|artificial intelligence|funding|startup|raises|million|billion",
+    ),
+    # SiliconANGLE - Enterprise AI and funding
+    RSSSource(
+        name="siliconangle",
+        feed_url="https://siliconangle.com/category/ai/feed/",
+        priority=8,
+        enabled=True,
     ),
 ]
 
