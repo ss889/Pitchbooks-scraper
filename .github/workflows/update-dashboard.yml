@@ -2,8 +2,9 @@ name: Update Dashboard Daily
 
 on:
   schedule:
-    # Run at 3 AM UTC daily (after scraper runs at 2 AM)
-    - cron: '0 3 * * *'
+    # Run twice daily for fresh data
+    - cron: '0 6 * * *'   # 6 AM UTC (1 AM EST)
+    - cron: '0 18 * * *'  # 6 PM UTC (1 PM EST)
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
@@ -22,17 +23,20 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          playwright install chromium
       
-      - name: Run scraper
-        run: python scheduler.py --run-now
+      - name: Run RSS scraper
+        run: python run_rss_scraper.py
+        continue-on-error: true
+      
+      - name: Re-parse for deals
+        run: python reparse_articles.py
         continue-on-error: true
       
       - name: Generate dashboard
-        run: python simple_viewer.py
+        run: python -c "from viewer import generate_dashboard; generate_dashboard()"
       
       - name: Copy dashboard to docs
-        run: cp dashboard.html docs/index.html
+        run: cp output/dashboard.html docs/index.html
       
       - name: Commit and push changes
         run: |
