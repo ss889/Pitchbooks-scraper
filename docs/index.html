@@ -83,6 +83,71 @@
             gap: 1.5rem;
         }
         
+        .investors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .investor-card {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .investor-name {
+            font-weight: 600;
+            color: #22c55e;
+        }
+        
+        .deal-count {
+            background: rgba(34, 197, 94, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .startups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .startup-card {
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .startup-name {
+            font-weight: 600;
+            color: #f97316;
+        }
+        
+        .startup-funding {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+        
+        .startup-round {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        .no-data {
+            color: #64748b;
+            font-style: italic;
+        }
+        
         .article-card {
             background: rgba(30, 27, 75, 0.5);
             border: 1px solid rgba(99, 102, 241, 0.2);
@@ -2420,6 +2485,20 @@
             </div>
         </div>
         
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🏆 Top Investors</h2>
+            <div class="investors-grid">
+                <div class="investor-card"><span class="investor-name">Benchmark</span><span class="deal-count">2 deals</span></div><div class="investor-card"><span class="investor-name">Insight</span><span class="deal-count">2 deals</span></div><div class="investor-card"><span class="investor-name">Spark</span><span class="deal-count">1 deal</span></div><div class="investor-card"><span class="investor-name">Redpoint</span><span class="deal-count">1 deal</span></div><div class="investor-card"><span class="investor-name">Andreessen Horowitz</span><span class="deal-count">1 deal</span></div><div class="investor-card"><span class="investor-name">Sequoia</span><span class="deal-count">1 deal</span></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🚀 Top Funded Startups</h2>
+            <div class="startups-grid">
+                <div class="startup-card"><span class="startup-name">Reliance</span><span class="startup-funding">$110000.0M</span><span class="startup-round">None</span></div><div class="startup-card"><span class="startup-name">OpenAI</span><span class="startup-funding">$100000.0M</span><span class="startup-round">None</span></div><div class="startup-card"><span class="startup-name">The</span><span class="startup-funding">$1000.0M</span><span class="startup-round">None</span></div><div class="startup-card"><span class="startup-name">The Download</span><span class="startup-funding">$200.0M</span><span class="startup-round">None</span></div><div class="startup-card"><span class="startup-name">Just</span><span class="startup-funding">$100.0M</span><span class="startup-round">merger</span></div><div class="startup-card"><span class="startup-name">Railway</span><span class="startup-funding">$100.0M</span><span class="startup-round">series_a</span></div><div class="startup-card"><span class="startup-name">Listen Labs</span><span class="startup-funding">$69.0M</span><span class="startup-round">series_b</span></div><div class="startup-card"><span class="startup-name">Freeform</span><span class="startup-funding">$67.0M</span><span class="startup-round">series_b</span></div><div class="startup-card"><span class="startup-name">Nous Research</span><span class="startup-funding">$65.0M</span><span class="startup-round">None</span></div><div class="startup-card"><span class="startup-name">SpaceX</span><span class="startup-funding">$50.0M</span><span class="startup-round">series_a</span></div>
             </div>
         </div>
         

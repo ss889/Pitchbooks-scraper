@@ -39,6 +39,49 @@ def create_dashboard(show_all: bool = False):
     deals = db.get_deals(limit=100)
     stats = db.get_statistics()
     
+    # Extract top investors and startups from deals
+    investor_counts = {}
+    startup_data = {}
+    for deal in deals:
+        # Count investors
+        if deal.get('investors'):
+            for inv in deal['investors'].split(', '):
+                inv = inv.strip()
+                if inv and len(inv) > 2:
+                    investor_counts[inv] = investor_counts.get(inv, 0) + 1
+        # Track startups with funding
+        company = deal.get('company_name')
+        if company and len(company) > 2 and deal.get('funding_amount'):
+            if company not in startup_data or deal['funding_amount'] > startup_data[company]['amount']:
+                startup_data[company] = {
+                    'name': company,
+                    'amount': deal['funding_amount'],
+                    'round': deal.get('round_type', 'Unknown'),
+                    'date': deal.get('announcement_date', '')
+                }
+    
+    # Sort investors by deal count, startups by funding
+    top_investors = sorted(investor_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+    top_startups = sorted(startup_data.values(), key=lambda x: x['amount'], reverse=True)[:10]
+    
+    # Build investors HTML
+    investors_html = ""
+    if top_investors:
+        for inv_name, deal_count in top_investors:
+            plural = "s" if deal_count > 1 else ""
+            investors_html += f'''<div class="investor-card"><span class="investor-name">{inv_name}</span><span class="deal-count">{deal_count} deal{plural}</span></div>'''
+    else:
+        investors_html = '<p class="no-data">No investor data yet</p>'
+    
+    # Build startups HTML
+    startups_html = ""
+    if top_startups:
+        for s in top_startups:
+            amount_str = f"${s['amount']/1e6:.1f}M" if s['amount'] >= 1e6 else f"${s['amount']/1e3:.0f}K"
+            startups_html += f'''<div class="startup-card"><span class="startup-name">{s["name"]}</span><span class="startup-funding">{amount_str}</span><span class="startup-round">{s["round"]}</span></div>'''
+    else:
+        startups_html = '<p class="no-data">No startup data yet</p>'
+    
     # Build articles HTML
     articles_html = ""
     for i, article in enumerate(articles):
@@ -199,6 +242,71 @@ def create_dashboard(show_all: bool = False):
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 1.5rem;
+        }}
+        
+        .investors-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }}
+        
+        .investor-card {{
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }}
+        
+        .investor-name {{
+            font-weight: 600;
+            color: #22c55e;
+        }}
+        
+        .deal-count {{
+            background: rgba(34, 197, 94, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }}
+        
+        .startups-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }}
+        
+        .startup-card {{
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }}
+        
+        .startup-name {{
+            font-weight: 600;
+            color: #f97316;
+        }}
+        
+        .startup-funding {{
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #60a5fa;
+        }}
+        
+        .startup-round {{
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }}
+        
+        .no-data {{
+            color: #64748b;
+            font-style: italic;
         }}
         
         .article-card {{
@@ -492,6 +600,20 @@ def create_dashboard(show_all: bool = False):
             <h2>💰 Funding Deals</h2>
             <div class="grid">
                 {deals_html}
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🏆 Top Investors</h2>
+            <div class="investors-grid">
+                {investors_html}
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🚀 Top Funded Startups</h2>
+            <div class="startups-grid">
+                {startups_html}
             </div>
         </div>
         
