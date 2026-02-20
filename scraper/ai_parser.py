@@ -67,11 +67,12 @@ class AINewsParser:
         }
     }
     
-    # Funding patterns
+    # Funding patterns - more flexible
     FUNDING_PATTERNS = [
-        r'\$(\d+\.?\d*)\s*(?:million|m|bn|b|k)',  # $5M, $1.2B, $500K
-        r'(?:raises?|secured?|closed|obtained?|announced?)\s+\$(\d+\.?\d*)\s*(?:million|m|bn|b|k)',
-        r'(?:series|round)\s*[a-z]\s*(?:of|worth)?\s*\$(\d+\.?\d*)\s*(?:million|m|bn|b|k)',
+        r'\$(\d+\.?\d*)\s*(?:billion|million|m\b|bn\b|b\b|k\b)',  # $5M, $1.2B, $500K
+        r'(?:raises?|secured?|closed|obtained?|announced?|worth|valued?\s*at)\s+\$(\d+\.?\d*)\s*(?:billion|million|m\b|bn\b|b\b|k\b)?',
+        r'(?:series|round)\s*[a-z]\s*(?:of|worth)?\s*\$(\d+\.?\d*)\s*(?:billion|million|m\b|bn\b|b\b|k\b)?',
+        r'(\d+\.?\d*)\s*(?:billion|million)\s*(?:dollar|usd)?(?:\s*in\s*funding)?',
     ]
     
     FUNDING_MULTIPLIERS = {
@@ -80,6 +81,7 @@ class AINewsParser:
         'million': 1_000_000,
         'b': 1_000_000_000,
         'bn': 1_000_000_000,
+        'billion': 1_000_000_000,
     }
     
     # Round types
@@ -101,13 +103,20 @@ class AINewsParser:
         "openai", "anthropic", "google", "meta", "microsoft", "tesla", "nvidia",
         "groq", "together", "cohere", "stability", "hugging face", "mistral",
         "aleph alpha", "adept", "jasper", "copy.ai", "perplexity", "scale ai",
-        "databricks", "modal", "vllm", "fireworks", "novita", "sam altman",
+        "databricks", "modal", "vllm", "fireworks", "novita", "inflection",
+        "character ai", "runway", "midjourney", "pika", "glean", "writer",
+        "read ai", "sierra", "cognition", "devin", "factory", "magic",
+        "cursor", "replit", "codeium", "tabnine", "sourcegraph", "anyscale",
+        "langchain", "llamaindex", "pinecone", "weaviate", "chroma", "qdrant",
+        "deepmind", "xai", "ai21", "amazon bedrock", "cerebras", "sambanova",
     }
     
     MAJOR_INVESTORS = {
         "sequoia", "a16z", "andreessen horowitz", "benchmark", "greylock", "khosla",
         "redpoint", "menlo", "spark", "vertex", "bessemer", "lightspeed", "insight",
-        "accel", "fb fund", "google ventures", "microsoft venture", "openai startup",
+        "accel", "founders fund", "google ventures", "microsoft ventures", "tiger global",
+        "softbank", "general catalyst", "index ventures", "thrive capital", "coatue",
+        "felicis", "kleiner perkins", "nea", "ivp", "dst global", "global founders",
     }
     
     def __init__(self):
@@ -322,32 +331,63 @@ class AINewsParser:
     
     def _extract_primary_company(self, text: str) -> Optional[str]:
         """Extract the main company being discussed."""
+        # Blocklist of common false positives 
+        blocklist = {
+            'the', 'and', 'for', 'new', 'how', 'why', 'what', 'this', 'that',
+            'former', 'china', 'saudi', 'retail', 'partnerships', 'just',
+            'african', 'asian', 'european', 'american', 'global', 'local',
+            'pitchbook', 'report', 'article', 'news', 'breaking', 'latest',
+            'india', 'indian', 'china', 'chinese', 'us', 'uk'
+        }
+        
+        # First check for known AI companies (most reliable)
+        text_lower = text.lower()
+        for company in self.MAJOR_AI_COMPANIES:
+            if company in text_lower:
+                # Check if it appears in a funding context
+                pattern = rf'\b{company}\b.*?(?:raises?|announces?|secured?|closes?|funding|billion|million)'
+                if re.search(pattern, text_lower):
+                    return company.title()
+        
         # Look for patterns like "{Company} raises" or "{Company} announces"
         patterns = [
-            r'([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)?)\s+(?:raises?|announces?|secured?)',
-            r'(?:startup|company)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)?)',
+            r'([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)?)\s+(?:raises?|announces?|secured?|closes?)\s+\$',
+            r'(?:startup|company)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)?)\s+(?:raises?|has)',
+            r'^([A-Z][a-zA-Z]+(?:\s+AI)?)\s+raises?\s+\$',
         ]
         
         for pattern in patterns:
             match = re.search(pattern, text)
             if match:
-                return match.group(1)
+                name = match.group(1).strip()
+                if name.lower() not in blocklist and len(name) > 2:
+                    return name
         
         return None
     
     def _extract_company_from_title(self, title: str) -> Optional[str]:
         """Extract company name from article title."""
-        # Look for company name patterns
-        patterns = [
-            r'^\s*([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)?)',
-        ]
+        # Blocklist
+        blocklist = {
+            'the', 'and', 'for', 'new', 'how', 'why', 'what', 'this', 'that',
+            'former', 'china', 'saudi', 'retail', 'partnerships', 'just',
+            'african', 'asian', 'european', 'american', 'global', 'local',
+            'pitchbook', 'report', 'article', 'news', 'breaking', 'latest',
+            'close', 'indexes', 'india', 'indian'
+        }
         
-        for pattern in patterns:
-            match = re.search(pattern, title)
-            if match:
-                name = match.group(1)
-                if len(name) > 2:
-                    return name
+        # First check for known AI companies 
+        title_lower = title.lower()
+        for company in self.MAJOR_AI_COMPANIES:
+            if company in title_lower:
+                return company.title()
+        
+        # Try: Look for "X raises $Y" pattern
+        funding_match = re.search(r'^([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)?)\s+raises?\s+\$', title)
+        if funding_match:
+            name = funding_match.group(1)
+            if name.lower() not in blocklist and len(name) > 2:
+                return name
         
         return None
     
