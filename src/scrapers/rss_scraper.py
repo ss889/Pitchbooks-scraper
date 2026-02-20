@@ -53,11 +53,25 @@ class RSSSource:
 # RSS Sources ranked by newsletter value
 # These complement PitchBook's deal data with narrative journalism
 RSS_SOURCES = [
+    # TechCrunch AI - Breaking AI news and funding
+    RSSSource(
+        name="techcrunch_ai",
+        feed_url="https://techcrunch.com/category/artificial-intelligence/feed/",
+        priority=1,
+        enabled=True,
+    ),
+    # TechCrunch Startups - Funding rounds coverage
+    RSSSource(
+        name="techcrunch_startups",
+        feed_url="https://techcrunch.com/category/startups/feed/",
+        priority=2,
+        enabled=True,
+    ),
     # Ars Technica - Reliable tech AI analysis  
     RSSSource(
         name="arstechnica_ai",
         feed_url="https://feeds.arstechnica.com/arstechnica/technology-lab",
-        priority=1,
+        priority=3,
         enabled=True,
         category_filter="ai|artificial intelligence|machine learning|neural|llm|chatgpt|openai|anthropic",
     ),
@@ -65,13 +79,13 @@ RSS_SOURCES = [
     RSSSource(
         name="theverge_ai",
         feed_url="https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
-        priority=2,
+        priority=4,
         enabled=True,
     ),
     RSSSource(
         name="venturebeat_ai",
         feed_url="https://venturebeat.com/category/ai/feed/",
-        priority=3,
+        priority=5,
         enabled=True,
     ),
     # MIT Tech Review - For research-focused AI news
