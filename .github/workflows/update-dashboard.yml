@@ -33,10 +33,10 @@ jobs:
         continue-on-error: true
       
       - name: Generate dashboard
-        run: python -c "from viewer import generate_dashboard; generate_dashboard()"
+        run: python simple_viewer.py
       
       - name: Copy dashboard to docs
-        run: cp output/dashboard.html docs/index.html
+        run: cp dashboard.html docs/index.html
       
       - name: Commit and push changes
         run: |
