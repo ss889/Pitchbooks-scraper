@@ -74,6 +74,29 @@ RSS_SOURCES = [
         enabled=True,
         category_filter="ai|artificial intelligence|machine learning",
     ),
+    # CBInsights - AI funding research and analysis
+    RSSSource(
+        name="cbinsights",
+        feed_url="https://www.cbinsights.com/research/feed/",
+        priority=5,
+        enabled=True,
+        category_filter="ai|artificial intelligence|funding|startup|venture",
+    ),
+    # Google News - AI startup funding aggregator (100+ articles)
+    RSSSource(
+        name="google_news_ai_funding",
+        feed_url="https://news.google.com/rss/search?q=AI+startup+funding+round&hl=en-US&gl=US&ceid=US:en",
+        priority=6,
+        enabled=True,
+    ),
+    # Yahoo Finance - Business/funding news
+    RSSSource(
+        name="yahoo_finance",
+        feed_url="https://finance.yahoo.com/rss/topstories",
+        priority=7,
+        enabled=True,
+        category_filter="ai|artificial intelligence|funding|startup|raises|million|billion",
+    ),
 ]
 
 
