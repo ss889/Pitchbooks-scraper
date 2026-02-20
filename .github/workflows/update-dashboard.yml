@@ -1,0 +1,43 @@
+name: Update Dashboard Daily
+
+on:
+  schedule:
+    # Run at 3 AM UTC daily (after scraper runs at 2 AM)
+    - cron: '0 3 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+      
+      - name: Run scraper
+        run: python scheduler.py --run-now
+        continue-on-error: true
+      
+      - name: Generate dashboard
+        run: python simple_viewer.py
+      
+      - name: Copy dashboard to docs
+        run: cp dashboard.html docs/index.html
+      
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --staged --quiet || git commit -m "Auto-update dashboard $(date +'%Y-%m-%d')"
+          git push
